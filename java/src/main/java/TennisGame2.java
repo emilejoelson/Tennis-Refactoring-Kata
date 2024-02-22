@@ -1,9 +1,11 @@
+import java.util.HashMap;
+import java.util.Map;
 
 public class TennisGame2 implements TennisGame
 {
     public int P1point = 0;
     public int P2point = 0;
-    
+
     public String P1res = "";
     public String P2res = "";
     private String player1Name;
@@ -14,81 +16,44 @@ public class TennisGame2 implements TennisGame
         this.player2Name = player2Name;
     }
 
+    String score = "";
     public String getScore(){
-        String score = "";
+
         if (P1point == P2point && P1point < 4)
         {
-            if (P1point==0)
-                score = "Love";
-            if (P1point==1)
-                score = "Fifteen";
-            if (P1point==2)
-                score = "Thirty";
-            score += "-All";
+            score = getScoreEqualAndUnderThanFour();
         }
         if (P1point==P2point && P1point>=3)
             score = "Deuce";
-        
+
         if (P1point > 0 && P2point==0)
         {
-            if (P1point==1)
-                P1res = "Fifteen";
-            if (P1point==2)
-                P1res = "Thirty";
-            if (P1point==3)
-                P1res = "Forty";
-            
-            P2res = "Love";
-            score = P1res + "-" + P2res;
+            score = getScoreP1PositiveAndP2EqualZero();
         }
         if (P2point > 0 && P1point==0)
         {
-            if (P2point==1)
-                P2res = "Fifteen";
-            if (P2point==2)
-                P2res = "Thirty";
-            if (P2point==3)
-                P2res = "Forty";
-            
-            P1res = "Love";
-            score = P1res + "-" + P2res;
+            score = getScoreFrom50to30();
         }
-        
+
         if (P1point>P2point && P1point < 4)
         {
-            if (P1point==2)
-                P1res="Thirty";
-            if (P1point==3)
-                P1res="Forty";
-            if (P2point==1)
-                P2res="Fifteen";
-            if (P2point==2)
-                P2res="Thirty";
-            score = P1res + "-" + P2res;
+            score = getScorePlayer1Advantage();
         }
         if (P2point>P1point && P2point < 4)
         {
-            if (P2point==2)
-                P2res="Thirty";
-            if (P2point==3)
-                P2res="Forty";
-            if (P1point==1)
-                P1res="Fifteen";
-            if (P1point==2)
-                P1res="Thirty";
-            score = P1res + "-" + P2res;
+            score = getScorePlayer2Advantage();
         }
-        
+
         if (P1point > P2point && P2point >= 3)
         {
             score = "Advantage player1";
         }
-        
+
         if (P2point > P1point && P1point >= 3)
         {
             score = "Advantage player2";
         }
-        
+
         if (P1point>=4 && P2point>=0 && (P1point-P2point)>=2)
         {
             score = "Win for player1";
@@ -99,29 +64,81 @@ public class TennisGame2 implements TennisGame
         }
         return score;
     }
-    
+
     public void SetP1Score(int number){
-        
+
         for (int i = 0; i < number; i++)
         {
             P1Score();
         }
-            
+
     }
-    
+
+    //The refactoring function
+    private  String getScoreEqualAndUnderThanFour(){
+        Map<Integer,String> scoreMap = Map.of(
+                0,"Love",
+                1,"Fifteen",
+                2,"Thirty"
+        );
+
+        return scoreMap.getOrDefault(P1point,"")+"-All";
+    }
+    private  String getScoreP1PositiveAndP2EqualZero(){
+        Map<Integer,String> scoreMap = Map.of(
+                1,"Fifteen",
+                2,"Thirty",
+                3,"Forty"
+        );
+        P1res = scoreMap.getOrDefault(P1point, "");
+        P2res = "Love";
+        String score = P1res + "-" + P2res;
+        return score;
+    }
+    private String getScoreFrom50to30(){
+        Map<Integer,String> scoreMap = Map.of(
+                1,"Fifteen",
+                2,"Thirty",
+                3,"Forty"
+        );
+
+        //Initialization
+        P1res = "";
+        P2res = "";
+        P2res = scoreMap.getOrDefault(P2point,"");
+        P1res = "Love";
+        score = P1res + "-" + P2res;
+        return  score;
+    }
+    private String getScorePlayer1Advantage(){
+        String[] scores = {"Love", "Fifteen", "Thirty", "Forty"};
+        P1res = (P1point >= 0 && P1point < scores.length) ? scores[P1point] : "";
+        P2res = (P2point >= 0 && P2point < scores.length) ? scores[P2point] : "";
+        score = P1res + "-" + P2res;
+        return  score;
+    }
+
+    private String getScorePlayer2Advantage(){
+        String [] scores = {"Love","Fifteen","Thirty","Forty"};
+        P1res = (P1point>=0 && P1point<scores.length)?scores[P1point]:"";
+        P2res = (P2point >= 0 && P2point < scores.length) ? scores[P2point] : "";
+        score = P1res + "-" + P2res;
+        return score;
+    }
+
     public void SetP2Score(int number){
-        
+
         for (int i = 0; i < number; i++)
         {
             P2Score();
         }
-            
+
     }
-    
+
     public void P1Score(){
         P1point++;
     }
-    
+
     public void P2Score(){
         P2point++;
     }

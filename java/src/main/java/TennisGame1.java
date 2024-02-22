@@ -1,6 +1,8 @@
+import java.util.HashMap;
+import java.util.Map;
 
 public class TennisGame1 implements TennisGame {
-    
+
     private int m_score1 = 0;
     private int m_score2 = 0;
     private String player1Name;
@@ -12,65 +14,72 @@ public class TennisGame1 implements TennisGame {
     }
 
     public void wonPoint(String playerName) {
-        if (playerName == "player1")
-            m_score1 += 1;
+        if ("player1".equals(playerName))
+            m_score1 ++;
         else
-            m_score2 += 1;
+            m_score2 ++;
     }
 
-    public String getScore() {
-        String score = "";
-        int tempScore=0;
-        if (m_score1==m_score2)
-        {
-            switch (m_score1)
-            {
-                case 0:
-                        score = "Love-All";
-                    break;
-                case 1:
-                        score = "Fifteen-All";
-                    break;
-                case 2:
-                        score = "Thirty-All";
-                    break;
-                default:
-                        score = "Deuce";
-                    break;
-                
-            }
+    // Variable
+    String score = "";
+    int tempScore=0;
+    public  String getScore(){
+        if (m_score1==m_score2){
+            score = getScoreEqual();
         }
-        else if (m_score1>=4 || m_score2>=4)
-        {
-            int minusResult = m_score1-m_score2;
-            if (minusResult==1) score ="Advantage player1";
-            else if (minusResult ==-1) score ="Advantage player2";
-            else if (minusResult>=2) score = "Win for player1";
-            else score ="Win for player2";
+        else if(m_score1>=4 || m_score2>=4){
+            score =  getScoreWin();
         }
-        else
-        {
-            for (int i=1; i<3; i++)
-            {
-                if (i==1) tempScore = m_score1;
-                else { score+="-"; tempScore = m_score2;}
-                switch(tempScore)
-                {
-                    case 0:
-                        score+="Love";
-                        break;
-                    case 1:
-                        score+="Fifteen";
-                        break;
-                    case 2:
-                        score+="Thirty";
-                        break;
-                    case 3:
-                        score+="Forty";
-                        break;
-                }
-            }
+        else {
+            score = getScoreRegular();
         }
+
         return score;
     }
+
+    private  String getScoreEqual(){
+        Map<Integer,String> score = Map.of(
+                0, "Love-All",
+                1, "Fifteen-All",
+                2, "Thirty-All"
+        );
+        return  score.getOrDefault(m_score1,"Deuce");
+    }
+    private String getScoreWin() {
+        int scoreDifference = m_score1 - m_score2;
+
+        if (scoreDifference == 1) {
+            return "Advantage player1";
+        } else if (scoreDifference == -1) {
+            return "Advantage player2";
+        } else if (scoreDifference >= 2) {
+            return "Win for player1";
+        } else if (scoreDifference <= -2) {
+            return "Win for player2";
+        } else {
+            throw new IllegalStateException("Invalid score difference");
+        }
+    }
+
+    private String getScoreRegular() {
+        Map<Integer, String> scoreMap = Map.of(
+                0, "Love",
+                1, "Fifteen",
+                2, "Thirty",
+                3, "Forty"
+        );
+
+        StringBuilder scoreBuilder = new StringBuilder();
+        appendScore(scoreBuilder, m_score1, scoreMap);
+        scoreBuilder.append("-");
+        appendScore(scoreBuilder, m_score2, scoreMap);
+
+        return scoreBuilder.toString();
+    }
+
+    private void appendScore(StringBuilder scoreBuilder, int score, Map<Integer, String> scoreMap) {
+        scoreBuilder.append(scoreMap.get(score));
+    }
+
+
 }

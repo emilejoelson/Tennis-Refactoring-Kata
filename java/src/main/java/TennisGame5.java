@@ -8,6 +8,15 @@ public class TennisGame5 implements TennisGame {
     private int player1Score;
     private int player2Score;
 
+    private static final Map<Integer, String> SCORE_NAMES = new HashMap<>();
+
+    static {
+        SCORE_NAMES.put(0, "Love");
+        SCORE_NAMES.put(1, "Fifteen");
+        SCORE_NAMES.put(2, "Thirty");
+        SCORE_NAMES.put(3, "Forty");
+    }
+
     public TennisGame5(String player1Name, String player2Name) {
         this.player1Name = player1Name;
         this.player2Name = player2Name;
@@ -25,46 +34,45 @@ public class TennisGame5 implements TennisGame {
 
     @Override
     public String getScore() {
-        int p1 = player1Score;
-        int p2 = player2Score;
-
-        while (p1 > 4 || p2 > 4) {
-            p1--;
-            p2--;
-        }
-
-        var lookup = new HashMap<Map.Entry, String>();
-        lookup.put(Map.entry(0, 0), "Love-All");
-        lookup.put(Map.entry(0, 1), "Love-Fifteen");
-        lookup.put(Map.entry(0, 2), "Love-Thirty");
-        lookup.put(Map.entry(0, 3), "Love-Forty");
-        lookup.put(Map.entry(0, 4), "Win for player2");
-        lookup.put(Map.entry(1, 0), "Fifteen-Love");
-        lookup.put(Map.entry(1, 1), "Fifteen-All");
-        lookup.put(Map.entry(1, 2), "Fifteen-Thirty");
-        lookup.put(Map.entry(1, 3), "Fifteen-Forty");
-        lookup.put(Map.entry(1, 4), "Win for player2");
-        lookup.put(Map.entry(2, 0), "Thirty-Love");
-        lookup.put(Map.entry(2, 1), "Thirty-Fifteen");
-        lookup.put(Map.entry(2, 2), "Thirty-All");
-        lookup.put(Map.entry(2, 3), "Thirty-Forty");
-        lookup.put(Map.entry(2, 4), "Win for player2");
-        lookup.put(Map.entry(3, 0), "Forty-Love");
-        lookup.put(Map.entry(3, 1), "Forty-Fifteen");
-        lookup.put(Map.entry(3, 2), "Forty-Thirty");
-        lookup.put(Map.entry(3, 3), "Deuce");
-        lookup.put(Map.entry(3, 4), "Advantage player2");
-        lookup.put(Map.entry(4, 0), "Win for player1");
-        lookup.put(Map.entry(4, 1), "Win for player1");
-        lookup.put(Map.entry(4, 2), "Win for player1");
-        lookup.put(Map.entry(4, 3), "Advantage player1");
-        lookup.put(Map.entry(4, 4), "Deuce");
-
-        var entry = Map.entry(p1, p2);
-        if (lookup.containsKey(entry)) {
-            return lookup.get(entry);
+        if (areScoresEqual()) {
+            return getEqualScore();
+        } else if (isAnyPlayerInAdvantage()) {
+            return getAdvantageOrWinScore();
         } else {
-            throw new IllegalArgumentException("Invalid score.");
+            return getRegularScore();
         }
+    }
+
+    private boolean areScoresEqual() {
+        return player1Score == player2Score;
+    }
+
+    private String getEqualScore() {
+        if (player1Score < 3) {
+            return SCORE_NAMES.get(player1Score) + "-All";
+        } else {
+            return "Deuce";
+        }
+    }
+
+    private boolean isAnyPlayerInAdvantage() {
+        return player1Score >= 4 || player2Score >= 4;
+    }
+
+    private String getAdvantageOrWinScore() {
+        int difference = player1Score - player2Score;
+        if (difference == 1) {
+            return "Advantage " + player1Name;
+        } else if (difference == -1) {
+            return "Advantage " + player2Name;
+        } else if (difference >= 2) {
+            return "Win for " + player1Name;
+        } else {
+            return "Win for " + player2Name;
+        }
+    }
+
+    private String getRegularScore() {
+        return SCORE_NAMES.get(player1Score) + "-" + SCORE_NAMES.get(player2Score);
     }
 }
